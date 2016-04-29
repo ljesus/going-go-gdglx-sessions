@@ -1,0 +1,309 @@
+Going Go
+An overview of golang
+27 May 2016
+Tags: golang
+
+Luís Jesus, Pedro Costa
+Fork IT
+
+luis.jesus@forkit.pt 
+pedro.costa@forkit.pt
+
+http://www.forkit.pt
+
+GDGLx Sessions #1
+
+* What is Go?
+
+Go is a programming language.
+
+- Imperative
+- Compiled
+- Strongly and statically typed
+
+Also:
+
+- Highly opinionated.
+- Mix of Python and C
+- Built with concurrency and networking in mind
+
+* Gopher
+
+.image https://blog.golang.org/gopher/gopher.png
+
+* History
+
+.image go_timeline.png
+
+* Go changes
+
+Since Go1.5
+
+- Compiler fully in Go and Assembler (no more C, except for _cgo_ bindings)
+- Vendoring of external dependencies
+- *Garbage*Collector*improvements* (now concurrent)
+- _darwin/arm_, _darwin/arm64_ and _linux/arm64_ ports
+
+Since Go1.6
+
+- New improved Sort
+- HTTP/2 (default with HTTPS)
+- Detection of concurrent map access
+- *Even*more*Garbage*Collector*improvements*
+
+* GC in Go1.5
+
+.image gc345.png
+
+* GC in Go1.6
+
+.image gc56.png _ 600
+
+* Why Go?
+
+_“Go_will_be_the_server_language_of_the_future.”_-_Tobias_Lütke,_Shopify_
+_“Go_is_like_a_better_C,_from_the_guys_that_didn’t_bring_you_C++”_—_Ikai_Lan_
+
+- Standard lib
+- Deployment (static binaries are awesome )
+- Tooling  (govet, gofmt ... )
+- Syntax and formatting defaults
+- Performance
+- Easy to pick (productive within hours)
+- Community (invites open source contribution)
+
+* Standard Lib
+
+Provides wide range of functionality.
+
+- Encoding (ie. _encoding/json_, _encoding/xml_)
+- Archive and Compression (i.e. _compress/gzip_)
+- Bytes and Strings related packages (_fmt_, _strings_, _bytes_, _unicode_)
+- Templating (_text/template_, _html/template_)
+- Collections ( _container/heap_, _container/ring_)
+- File and Operating System ( _io_, _io/iutil_, _os_, _exec_, _flag_)
+- Cryptography ( _crypto_)
+- Networking (_net_, _net/http_, _net/rpc_, _net/smtp_)
+- Reflection (_reflect_)
+- Graphics related (_image/draw_, _image/png_, _image/jpeg_ )
+
+* Tooling
+
+- Formatting (_go_fmt_)
+- Linting/Common Mistakes (_go_vet_)
+- Testing (_go_test_)
+
+- Code coverage (_go_tool_cover_)
+- Profiling (_go_tool_pprof_, _net/http/pprof_)
+- Benchmarking (_benchcmp_)
+
+Package management is lacking.
+There are many external options (_Godep_, _Govendor_...)
+
+* Deployment
+
+- Fast compiling
+- Cross-compiling 
+- Binary deployment is easier
+- For web servers _net/http_ is enough and production ready.
+(A reverse proxy does help on SSL termination, access and error logs, sensible header defaults etc...)
+
+* Why Not Go?
+
+- *No*Generics*
+- Yup, no generics, but you can work around it (reflection, interfaces, copy pasting...)
+
+- No Exceptions (embrace the _if's_)
+
+- No operator overloading
+
+- _"Go_doesn't_really_do_anything_new."_ 
+
+- _"Go_is_a_programming_language_designed_by_Google_to_help_solve_Google's_problems"_-_Rob_Pike_
+
+* You have seen, maybe used it already
+
+- Google (dl.google.com served by Go)
+- YouTube's vitess: MySQL
+- Docker 
+- Dropbox 
+- Soundcloud
+- Heroku 
+- Iron.io
+- Canonical's Juju
+- Core OS's etcd and fleet
+- InfluxDB
+
+.link https://github.com/golang/go/wiki/GoUsers And more...
+
+* Niceties and Syntax
+
+* Static Typing
+
+Type inferrence makes static types somewhat OK!
+
+.code static_typing.go /^func main/,/^}/
+
+* No Semi-Colons; Fewer Brackets
+
+.play -edit niceties.go /^func main/,/^}/
+
+* Multi-value returns
+
+- Return values can also be named.
+
+.play multivalue.go
+
+* Loops
+There is only `for`
+
+	for {
+		fmt.Println("We can go on like this, forever!")
+	}
+
+	for cursor.HasNext() {
+		row := cursor.Next()
+		// process results
+	}
+
+	for int i := 0; i < len(list); i++ {
+
+	} 
+
+* Range
+Easy slice and map iteration
+
+.play range.go
+
+* Defer
+
+Execute a statement before returning from a function, regardless of exit path.
+
+.code defer.go
+
+* Style
+
+There is One True Formatting style for Go. It is enforced by `go fmt`.
+
+Unused imports and variables are compiler errors.
+
+Without the choice, you can focus on writing great code!
+
+* Structs
+
+.play -edit structs.go
+
+* Structs (II)
+
+.play -edit structs2.go /START OMIT/,/END OMIT/
+
+* Methods
+
+.play -edit methods.go
+
+You can define a method on any type, not just structs!
+
+* Interfaces
+
+Interfaces are implicit; if a datatype implements the methods of an interface,
+it implements that interface. No `implements` keyword!
+
+* Interfaces (II)
+
+.play -edit interfaces.go
+
+* Concurrency
+
+* What Is Concurrency?
+
+Concurrency is when two tasks can start, run, and complete in overlapping time
+periods. It doesn't necessarily mean they'll ever both be running at the same
+instant.
+
+* Concurrency Is Not Parallelism
+
+Parallelism implies execution at literally the same time, on different cores,
+processors, or systems.
+
+Concurrency exists without parallelism.
+
+- Concurrency is about *dealing* with lots of things at once.
+- Parallelism is about *doing* lots of things at once.
+
+.link https://blog.golang.org/concurrency-is-not-parallelism More info about this here
+
+* Go Provides Concurrency, And Takes Advantage Of Paralleism
+
+Go's built-in scheduler runs lightweight threads on available processors in
+conjunction with a "hidden" async I/O model.
+
+* Goroutines
+
+A goroutine is a lightweight thread managed by the Go runtime.
+
+    go f(x, y, z)
+starts a new goroutine running
+
+    f(x, y, z)
+The evaluation of f, x, y, and z happens in the current goroutine and the execution of f happens in the new goroutine.
+
+Like threads, but lightweight in both syntax and resources used.
+
+* Goroutines (II)
+
+.play -edit goroutinehelloworld.go 
+
+* Goroutines (III)
+
+.play goroutineprint.go /START OMIT/,/END OMIT/
+
+* Goroutines
+
+Goroutines stop when the called function exits. You cannot stop a goroutine
+from another Goroutine.
+
+* Don't communicate by sharing memory; share memory by communicating.
+
+* Channels
+
+Like Unix pipes.
+
+- Signal completion to other Goroutines
+- Give "work" to Goroutines
+- Shut down other Goroutines
+
+* Channels (II)
+
+Channels are a typed conduit through which you can send and receive values with the channel operator, <-.
+
+    ch <- v    // Send v to channel ch.
+    v := <-ch  // Receive from ch, and assign value to v.
+(The data flows in the direction of the arrow.)
+
+Like maps and slices, channels must be created before use:
+
+    ch := make(chan int)
+
+* Channels (III)
+
+Signal completion
+
+.code channels.go
+
+* Channels (III)
+
+.play -edit channels2.go
+
+* Channels (IV)
+
+Shut down other Goroutines
+
+.code shutdown.go /START OMIT/,/END OMIT/
+
+* Our experience
+
+* Super Time-Saving Tip
+
+- Always google for *golang*
+
+* Now you can go go
